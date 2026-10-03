@@ -37,22 +37,7 @@ jobs:
           curl -L --fail -o Assets/Resources/Models/Bar/glass.obj "https://raw.githubusercontent.com/gabeochoa/pharmasea/main/resources/models/kennynl/sodaGlass.obj"
           curl -L --fail -o Assets/Resources/Models/Bar/glass.mtl "https://raw.githubusercontent.com/gabeochoa/pharmasea/main/resources/models/kennynl/sodaGlass.mtl"
 
-          cat > Assets/Resources/Models/ASSET_SOURCES.txt <<'EOF'
-BarShift ready-made visual assets
-================================
-
-Characters + idle/jump animations + skins:
-- Kenney Animated Characters 2
-- License: Creative Commons Zero (CC0)
-
-Bottle + glass:
-- Kenney Food Kit
-- License: Creative Commons Zero (CC0)
-
-Only visual models are premade. Gameplay logic, recipes, scoring,
-UI, bar scene construction, interactions and action sequences are
-implemented in the BarShift Unity project.
-EOF
+          printf '%s\n'             'BarShift ready-made visual assets'             '================================'             ''             'Characters + idle/jump animations + skins:'             '- Kenney Animated Characters 2'             '- License: Creative Commons Zero (CC0)'             ''             'Bottle + glass:'             '- Kenney Food Kit'             '- License: Creative Commons Zero (CC0)'             ''             'Only visual models are premade. Gameplay logic, recipes, scoring,'             'UI, bar scene construction, interactions and action sequences are'             'implemented in the BarShift Unity project.'             > Assets/Resources/Models/ASSET_SOURCES.txt
 
       - name: Commit project
         run: |
