@@ -1,3 +1,4 @@
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -12,16 +13,6 @@ public enum BarGameState
 
 public class BarGameController : MonoBehaviour
 {
-    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
-    private static void Bootstrap()
-    {
-        if (FindFirstObjectByType<BarGameController>() == null)
-        {
-            GameObject root = new GameObject("BarShift Game");
-            root.AddComponent<BarGameController>();
-        }
-    }
-
     private const string BestShiftKey = "BarShift_BestEarnings";
 
     private BarUI ui;
@@ -43,6 +34,7 @@ public class BarGameController : MonoBehaviour
     private int badCount;
     private int terribleCount;
     private int previousRecipeIndex = -1;
+    private bool actionLocked;
 
     public BarGameConfig Config => config;
     public BarGameState State => state;
@@ -71,17 +63,23 @@ public class BarGameController : MonoBehaviour
         if (state != BarGameState.Preparing)
             return;
 
-        patienceRemaining -= Time.deltaTime;
-        float ratio = Mathf.Clamp01(patienceRemaining / config.customerPatienceSeconds);
-        ui.SetPatience(ratio, patienceRemaining);
-
-        if (patienceRemaining <= 0f)
+        if (!actionLocked)
         {
-            CustomerTimedOut();
-            return;
+            patienceRemaining -= Time.deltaTime;
+
+            if (patienceRemaining <= 0f)
+            {
+                patienceRemaining = 0f;
+                ui.SetPatience(0f, 0f);
+                CustomerTimedOut();
+                return;
+            }
+
+            HandleKeyboardInput();
         }
 
-        HandleKeyboardInput();
+        float ratio = Mathf.Clamp01(patienceRemaining / config.customerPatienceSeconds);
+        ui.SetPatience(ratio, patienceRemaining);
     }
 
     private void LoadData()
@@ -116,6 +114,7 @@ public class BarGameController : MonoBehaviour
         badCount = 0;
         terribleCount = 0;
         previousRecipeIndex = -1;
+        actionLocked = false;
         mixer.Reset();
         BeginNextCustomer();
     }
@@ -127,6 +126,8 @@ public class BarGameController : MonoBehaviour
 
     public void GoToMainMenu()
     {
+        StopAllCoroutines();
+        actionLocked = false;
         state = BarGameState.MainMenu;
         mixer.Reset();
         ui.ShowMainMenu(bestEarnings);
@@ -157,38 +158,46 @@ public class BarGameController : MonoBehaviour
 
     public void AddIngredient(IngredientType ingredient)
     {
-        if (state != BarGameState.Preparing)
+        if (state != BarGameState.Preparing || actionLocked)
             return;
 
         if (!mixer.TryAdd(ingredient, config.maxUnitsInGlass))
         {
-            ui.FlashHint("Glass is full — reset or serve it.");
+            ui.FlashHint("Glass is full - reset or serve it.");
             return;
         }
 
+        StartCoroutine(PourSequence(ingredient));
+    }
+
+    private IEnumerator PourSequence(IngredientType ingredient)
+    {
+        actionLocked = true;
         audioPlayer.Pour();
+        yield return ui.AnimatePour(ingredient);
         ui.SetMix(mixer, config.maxUnitsInGlass);
+        actionLocked = false;
     }
 
     public void ResetGlass()
     {
-        if (state != BarGameState.Preparing)
+        if (state != BarGameState.Preparing || actionLocked)
             return;
 
         audioPlayer.Click();
         mixer.Reset();
         ui.SetMix(mixer, config.maxUnitsInGlass);
-        ui.FlashHint("Fresh glass.");
+        ui.FlashHint("Fresh shaker. Start again.");
     }
 
     public void ShakeDrink()
     {
-        if (state != BarGameState.Preparing)
+        if (state != BarGameState.Preparing || actionLocked)
             return;
 
         if (mixer.TotalUnits == 0)
         {
-            ui.FlashHint("Add something before shaking.");
+            ui.FlashHint("Add ingredients before shaking.");
             return;
         }
 
@@ -199,19 +208,34 @@ public class BarGameController : MonoBehaviour
         }
 
         mixer.Shake();
+        StartCoroutine(ShakeSequence());
+    }
+
+    private IEnumerator ShakeSequence()
+    {
+        actionLocked = true;
         audioPlayer.Shake();
+        yield return ui.AnimateShake();
         ui.SetMix(mixer, config.maxUnitsInGlass);
-        ui.FlashHint("Shake! Shake! Shake!");
+        actionLocked = false;
     }
 
     public void ServeDrink()
     {
-        if (state != BarGameState.Preparing)
+        if (state != BarGameState.Preparing || actionLocked)
             return;
 
+        StartCoroutine(ServeSequence());
+    }
+
+    private IEnumerator ServeSequence()
+    {
+        actionLocked = true;
         float patienceRatio = Mathf.Clamp01(patienceRemaining / config.customerPatienceSeconds);
         DrinkResult result = DrinkEvaluator.Evaluate(currentRecipe, mixer, config, patienceRatio);
+        yield return ui.AnimateServe();
         FinishCustomer(result);
+        actionLocked = false;
     }
 
     public void ContinueAfterResult()
@@ -231,6 +255,7 @@ public class BarGameController : MonoBehaviour
             return;
         }
 
+        actionLocked = false;
         state = BarGameState.Preparing;
         currentCustomer = customers[customersServed % customers.Count];
         currentRecipe = PickRecipe();
@@ -243,7 +268,7 @@ public class BarGameController : MonoBehaviour
         ui.SetOrder(currentRecipe);
         ui.SetPatience(1f, patienceRemaining);
         ui.SetMix(mixer, config.maxUnitsInGlass);
-        ui.FlashHint("Read the ticket, mix the drink, then serve.");
+        ui.FlashHint("Pick bottles from the shelf, then shake if the ticket asks for it.");
     }
 
     private DrinkRecipe PickRecipe()
@@ -265,6 +290,7 @@ public class BarGameController : MonoBehaviour
 
     private void CustomerTimedOut()
     {
+        actionLocked = false;
         DrinkResult result = new DrinkResult
         {
             accuracy = 0f,
@@ -274,7 +300,7 @@ public class BarGameController : MonoBehaviour
             tip = 0,
             totalEarned = 0,
             reaction = "I can't wait all night.",
-            detail = "The patience timer reached zero before the drink was served."
+            detail = "The customer left because the patience timer reached zero."
         };
 
         FinishCustomer(result);
@@ -303,6 +329,7 @@ public class BarGameController : MonoBehaviour
 
     private void FinishShift()
     {
+        actionLocked = false;
         state = BarGameState.ShiftComplete;
         bool newBest = totalEarnings > bestEarnings;
         if (newBest)
