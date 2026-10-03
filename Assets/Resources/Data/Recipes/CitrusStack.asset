@@ -1,0 +1,28 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 22222222222222222222222222222222, type: 3}
+  m_Name: CitrusStack
+  m_EditorClassIdentifier:
+  displayName: Citrus Stack
+  ingredients:
+  - ingredient: 0
+    amount: 1
+  - ingredient: 2
+    amount: 2
+  - ingredient: 3
+    amount: 2
+  - ingredient: 6
+    amount: 1
+  requiresShake: 1
+  basePrice: 18
+  description: Three citrus layers.
+  drinkColor: {r: 0.91, g: 0.66, b: 0.24, a: 1}

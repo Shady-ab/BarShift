@@ -1,0 +1,14 @@
+BarShift ready-made visual assets
+================================
+
+Characters + idle/jump animations + skins:
+- Kenney Animated Characters 2
+- License: Creative Commons Zero (CC0)
+
+Bottle + glass:
+- Kenney Food Kit
+- License: Creative Commons Zero (CC0)
+
+Only visual models are premade. Gameplay logic, recipes, scoring,
+UI, bar scene construction, interactions and action sequences are
+implemented in the BarShift Unity project.

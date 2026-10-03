@@ -1,0 +1,25 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!129 &1
+PlayerSettings:
+  m_ObjectHideFlags: 0
+  serializedVersion: 28
+  productGUID: 0fa8d5584fd64dc6ba648d8b83af1c11
+  companyName: Shadi
+  productName: BarShift - Mix & Serve
+  defaultScreenWidth: 1920
+  defaultScreenHeight: 1080
+  defaultScreenWidthWeb: 960
+  defaultScreenHeightWeb: 540
+  fullscreenMode: 3
+  resizableWindow: 1
+  runInBackground: 0
+  usePlayerLog: 1
+  bundleVersion: 1.0
+  applicationIdentifier:
+    Standalone: com.shadi.barshift
+  overrideDefaultApplicationIdentifier: 1
+  activeInputHandler: 2
+  useDeterministicCompilation: 1
+  gcIncremental: 1
+  apiCompatibilityLevel: 6
