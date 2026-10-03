@@ -29,6 +29,8 @@ public class BarUI : MonoBehaviour
     private Text resultTitle, resultCustomer, resultReaction, resultAccuracy, resultMoney, resultDetail, resultContinue;
     private Text shiftTitle, shiftMoney, shiftStats, shiftBest;
     private Coroutine hintRoutine;
+    private SimpleObjectPool hintPulsePool;
+    private Transform hintPulseParent;
 
     public void Initialize(BarGameController c)
     {
@@ -146,6 +148,7 @@ public class BarUI : MonoBehaviour
     {
         if (hintRoutine != null) StopCoroutine(hintRoutine);
         hintRoutine = StartCoroutine(Hint(message));
+        if (hintPulsePool != null) StartCoroutine(PlayPooledHintPulse());
     }
 
     private IEnumerator Hint(string message)
@@ -154,6 +157,32 @@ public class BarUI : MonoBehaviour
         hint.color = cream;
         yield return new WaitForSeconds(2f);
         hint.color = new Color(cream.r, cream.g, cream.b, 0.5f);
+    }
+
+    private IEnumerator PlayPooledHintPulse()
+    {
+        GameObject pulse = hintPulsePool.Get();
+        RectTransform rect = pulse.GetComponent<RectTransform>();
+        Image image = pulse.GetComponent<Image>();
+        rect.anchorMin = rect.anchorMax = new Vector2(0.5f, 0.18f);
+        rect.anchoredPosition = new Vector2(Random.Range(-120f, 120f), Random.Range(-5f, 35f));
+        rect.localScale = Vector3.one * 0.6f;
+        image.color = accent;
+
+        float elapsed = 0f;
+        const float duration = 0.35f;
+        while (elapsed < duration)
+        {
+            elapsed += Time.deltaTime;
+            float t = Mathf.Clamp01(elapsed / duration);
+            rect.localScale = Vector3.Lerp(Vector3.one * 0.6f, Vector3.one * 1.35f, t);
+            Color color = accent;
+            color.a = 1f - t;
+            image.color = color;
+            yield return null;
+        }
+
+        hintPulsePool.Release(pulse);
     }
 
     private void Build()
@@ -175,6 +204,17 @@ public class BarUI : MonoBehaviour
         game = BuildGame(canvasGo.transform);
         result = BuildResult(canvasGo.transform);
         shift = BuildShift(canvasGo.transform);
+
+        GameObject pulseTemplate = new GameObject("Hint Pulse Prototype", typeof(RectTransform), typeof(CanvasRenderer), typeof(Image));
+        pulseTemplate.transform.SetParent(canvasGo.transform, false);
+        RectTransform pulseRect = pulseTemplate.GetComponent<RectTransform>();
+        pulseRect.sizeDelta = new Vector2(18f, 18f);
+        Image pulseImage = pulseTemplate.GetComponent<Image>();
+        pulseImage.color = accent;
+        pulseTemplate.SetActive(false);
+        hintPulseParent = canvasGo.transform;
+        hintPulsePool = gameObject.AddComponent<SimpleObjectPool>();
+        hintPulsePool.Initialize(pulseTemplate, 6, hintPulseParent);
     }
 
     private GameObject BuildMenu(Transform parent)
