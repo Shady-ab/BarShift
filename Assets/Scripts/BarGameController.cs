@@ -49,6 +49,13 @@ public class BarGameController : MonoBehaviour
 
     private void Awake()
     {
+        if (Instance != null && Instance != this)
+        {
+            Destroy(gameObject);
+            return;
+        }
+        Instance = this;
+
         ui = GetComponent<BarUI>();
         if (ui == null) ui = gameObject.AddComponent<BarUI>();
 
@@ -58,6 +65,11 @@ public class BarGameController : MonoBehaviour
         LoadData();
         BuildCustomers();
         bestEarnings = PlayerPrefs.GetInt(BestShiftKey, 0);
+    }
+
+    private void OnDestroy()
+    {
+        if (Instance == this) Instance = null;
     }
 
     private void Start()
