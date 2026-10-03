@@ -1,0 +1,67 @@
+name: Bootstrap BarShift Project
+
+on:
+  push:
+    paths:
+      - '.github/workflows/bootstrap-project.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  bootstrap:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Copy base Unity project
+        run: |
+          git clone --depth 1 https://github.com/Shady-ab/BarShift-Unity.git /tmp/barshift-base
+          rsync -a --exclude='.git' --exclude='.github' /tmp/barshift-base/ ./
+
+      - name: Add ready-made CC0 assets
+        run: |
+          mkdir -p Assets/Resources/Models/Characters/Animations
+          mkdir -p Assets/Resources/Models/Characters/Skins
+          mkdir -p Assets/Resources/Models/Bar
+
+          curl -L --fail -o Assets/Resources/Models/Characters/characterMedium.fbx "https://raw.githubusercontent.com/sinanata/unity-3d-to-sprite-baker/main/Assets/Demo/Resources/Models/characterMedium.fbx"
+          curl -L --fail -o Assets/Resources/Models/Characters/Animations/idle.fbx "https://raw.githubusercontent.com/sinanata/unity-3d-to-sprite-baker/main/Assets/Demo/Resources/Models/Animations/idle.fbx"
+          curl -L --fail -o Assets/Resources/Models/Characters/Animations/jump.fbx "https://raw.githubusercontent.com/sinanata/unity-3d-to-sprite-baker/main/Assets/Demo/Resources/Models/Animations/jump.fbx"
+          curl -L --fail -o Assets/Resources/Models/Characters/Skins/skaterMaleA.png "https://raw.githubusercontent.com/sinanata/unity-3d-to-sprite-baker/main/Assets/Demo/Resources/Models/Skins/skaterMaleA.png"
+          curl -L --fail -o Assets/Resources/Models/Characters/Skins/skaterFemaleA.png "https://raw.githubusercontent.com/sinanata/unity-3d-to-sprite-baker/main/Assets/Demo/Resources/Models/Skins/skaterFemaleA.png"
+
+          curl -L --fail -o Assets/Resources/Models/Bar/soda-bottle.obj "https://raw.githubusercontent.com/gabeochoa/pharmasea/main/resources/models/kennynl/sodaBottle.obj"
+          curl -L --fail -o Assets/Resources/Models/Bar/soda-bottle.mtl "https://raw.githubusercontent.com/gabeochoa/pharmasea/main/resources/models/kennynl/sodaBottle.mtl"
+          curl -L --fail -o Assets/Resources/Models/Bar/glass.obj "https://raw.githubusercontent.com/gabeochoa/pharmasea/main/resources/models/kennynl/sodaGlass.obj"
+          curl -L --fail -o Assets/Resources/Models/Bar/glass.mtl "https://raw.githubusercontent.com/gabeochoa/pharmasea/main/resources/models/kennynl/sodaGlass.mtl"
+
+          cat > Assets/Resources/Models/ASSET_SOURCES.txt <<'EOF'
+BarShift ready-made visual assets
+================================
+
+Characters + idle/jump animations + skins:
+- Kenney Animated Characters 2
+- License: Creative Commons Zero (CC0)
+
+Bottle + glass:
+- Kenney Food Kit
+- License: Creative Commons Zero (CC0)
+
+Only visual models are premade. Gameplay logic, recipes, scoring,
+UI, bar scene construction, interactions and action sequences are
+implemented in the BarShift Unity project.
+EOF
+
+      - name: Commit project
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          if git diff --cached --quiet; then
+            echo "No changes to commit"
+          else
+            git commit -m "Import BarShift Unity project"
+            git push
+          fi
