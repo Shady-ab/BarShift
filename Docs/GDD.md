@@ -8,7 +8,7 @@
 | **Target platform** | PC (Windows), standalone build |
 | **Engine / Unity version** | Unity 6 LTS (6000.3.20f1), Built-in Render Pipeline, 3D |
 | **Orientation & reference resolution** | Landscape, 1920 × 1080 reference |
-| **Expected session length** | 4–7 minutes per six-customer shift |
+| **Expected session length** | 3-5 minutes per six-customer shift |
 | **Document version** | v1.0 — 2026-10-03 |
 
 ---
@@ -224,8 +224,8 @@ graph TD
 
 | Version | Date | Change |
 |---|---|---|
-| v0.1 | 2026-10-01 | Initial drink-order concept, recipe system, patience, payment, and six-customer shift |
-| v0.2 | 2026-10-02 | Added runtime UI, result screens, ScriptableObject recipes/config, and keyboard controls |
-| v0.3 | 2026-10-03 | Replaced the prototype-only presentation with a visible 3D bar, bartender/customer models, and clickable bottles |
-| v0.4 | 2026-10-03 | Added pour, shake, serve, and customer-reaction sequences; improved bottle click areas and scene readability |
+| v0.1 | 2026-09-25 | Initial drink-order concept, recipe system, patience, payment, and six-customer shift |
+| v0.2 | 2026-09-28 | Added runtime UI, result screens, ScriptableObject recipes/config, and keyboard controls |
+| v0.3 | 2026-10-01 | Replaced the prototype-only presentation with a visible 3D bar, bartender/customer models, and clickable bottles |
+| v0.4 | 2026-10-02 | Added pour, shake, serve, and customer-reaction sequences; improved bottle click areas and scene readability |
 | v1.0 | 2026-10-03 | Finalized character placement behind the bar, raised shelf, labels above bottles, mixing-cup shake, and final scope/documentation |
