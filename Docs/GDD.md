@@ -27,8 +27,6 @@ The player works one short bar shift serving six customers. Each customer shows 
 
 ## 2. Reference & Inspiration
 
-![Primary reference — Bartender: The Right Mix](images/reference-game.png)
-
 - **Primary reference:** [Bartender: The Right Mix](https://www.y8.com/games/bartender_the_right_mix). Taking: a visible bottle shelf, direct bottle selection, a clear shake/serve flow, and an immediate reaction after serving. Not taking: alcohol brands, exaggerated failure scenes, free-form real-world cocktail mixing, or the original visual style.
 - **Secondary reference:** [Papa's Freezeria](https://www.flipline.com/games/papasfreezeria/). Taking: order → prepare → score/reaction → payment pacing. Not taking: multiple work stations, unlockable ingredients, upgrades, lobby decoration, or long-term progression.
 - **Video:** [Papa's Freezeria official trailer / gameplay reference](https://www.youtube.com/watch?v=DV-5KWtcd_g) — useful for the short order-to-preparation-to-result rhythm.
@@ -101,7 +99,7 @@ stateDiagram-v2
 
 ## 5. Screens & UI
 
-![BarShift gameplay screen](images/barshift-gameplay.png)
+![BarShift gameplay screen](images/barshift-gameplay.webp)
 
 1. **Main Menu** — game title, `START SHIFT`, `HOW TO PLAY`, `QUIT`, and saved best-shift earnings.
 2. **How To Play** — explains bottle selection, exact ingredient units, the shake/no-shake rule, patience, and keyboard shortcuts.
